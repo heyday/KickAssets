@@ -2,11 +2,11 @@
 	var refreshFiles = function() {
 		$('#drop').load(window.location.href);
 	};
-	
-	
+
+
     var dnd = {
       ready : function()
-      {        
+      {
         $('#drop, #replace-file')
           .live(
             'dragenter',
@@ -22,7 +22,7 @@
 					e.preventDefault();
 					e.stopPropagation();
 				}
-			
+
 			)
           .live(
             'drop',
@@ -34,7 +34,7 @@
 	                e.stopPropagation();
 					$(this).removeClass('over');
 	              }
-			   }	
+			   }
             }
           )
 		  .live(
@@ -45,13 +45,13 @@
 				$(this).removeClass('over');
 			}
 		  );
-		
-		  
+
+
       },
 
       upload : function(files,url)
       {
-        // This is a work-around for Safari occaisonally hanging when doing a 
+        // This is a work-around for Safari occaisonally hanging when doing a
         // file upload.  For some reason, an additional HTTP request for a blank
         // page prior to sending the form will force Safari to work correctly.
 
@@ -59,7 +59,7 @@
 
         var http = new XMLHttpRequest();
 		// var progressBar = document.getElementById('progress');
-		// 
+		//
 		// // Update progress bar
 		// http.upload.addEventListener("progress", function (evt) {
 		// 	if (evt.lengthComputable) {
@@ -68,7 +68,7 @@
 		// 	else {
 		// 	}
 		// }, false);
-		
+
 		http.addEventListener("load", function () {
 			if(http.responseText != "OK") {
 				apprise(http.responseText);
@@ -114,19 +114,19 @@
         }
       }
     };
-	 
+
 $(document).ready(dnd.ready);
 $(document).ready(function() {
 //	$('#drop, #replace-file').livequery(dnd.ready);
 //	$('#drop').css('height',$('body').height()-20+'px');
 	var toRename;
-	
+
 	$('#newfolder').click(function() {
 		var $t = $(this);
 		$('#drop').load($t.attr('href'));
 		return false;
 	});
-	
+
 	$('.editable').live("dblclick", function(e) {
 		if(e.target.tagName == "INPUT") {e.target.select();return}
 		var $t = $(this);
@@ -139,7 +139,7 @@ $(document).ready(function() {
 
 
 	});
-	
+
 	$('.editable input').live("blur", function(e) {
 		if(!e.currentTarget.tagName == "INPUT") return;
 		var newName = $(this).val();
@@ -148,8 +148,8 @@ $(document).ready(function() {
 		$li.removeClass('ui-selected');
 		$li.load(
 			$('base').attr('href')+"admin/files/updatefilename",
-			{	
-				'new' : newName, 
+			{
+				'new' : newName,
 				'fileid' : $li.data('id')
 			}
 		);
@@ -158,15 +158,15 @@ $(document).ready(function() {
 			$(this).focusout();
 		}
 	});
-	
 
-	
+
+
 	$('#drop').livequery(function() {$(this).selectable({
 		cancel : '.editable,input',
 		filter : 'li',
 		selected : function() {
 			if($('.ui-selected').length > 1) {
-				$('a.togglestate.single').addClass('disabled');				
+				$('a.togglestate.single').addClass('disabled');
 				$('a.togglestate:not(.single)').removeClass('disabled');
 			}
 			else {
@@ -178,7 +178,7 @@ $(document).ready(function() {
 			$('a.togglestate').addClass('disabled');
 		}
 	});});
-	
+
 	$('#directory_list li').livequery(function() {$(this).draggable({
 	  delay: 500,
 	  distance: 30,
@@ -189,21 +189,21 @@ $(document).ready(function() {
 	    }
 	    var container = $('<div/>').attr('id', 'draggingContainer');
 	    container.append(selected.clone());
-	    return container; 
+	    return container;
 	  }
 	});});
-	
+
 	$('#directory_list.gallery li img, #directory_list.grid li').live("click", function(event) {
 		if(!event.metaKey) {
 			$('.ui-selected').removeClass('ui-selected');
-			$(this).closest('li').addClass('ui-selected');			
+			$(this).closest('li').addClass('ui-selected');
 		}
 		else {
 			$(this).closest('li').toggleClass('ui-selected');
 		}
 		if($('.ui-selected').length) {
 			if($('.ui-selected').length > 1) {
-				$('a.togglestate.single').addClass('disabled');				
+				$('a.togglestate.single').addClass('disabled');
 				$('a.togglestate:not(.single)').removeClass('disabled');
 			}
 			else {
@@ -215,7 +215,7 @@ $(document).ready(function() {
 		}
 		event.stopPropagation();
 	});
-	
+
 	// #('#drop').live("click",function(event) {
 	// 	$('.ui-selected').removeClass('ui-selected');
 	// })
@@ -226,7 +226,7 @@ $(document).ready(function() {
 			$(this).css('background','#ddd');
 		},
 		out: function() {
-			$(this).css('background','transparent');			
+			$(this).css('background','transparent');
 		},
 		drop: function(event, ui) {
 			var $li = $(this);
@@ -245,19 +245,19 @@ $(document).ready(function() {
 		},
 		tolerance: 'pointer'
 	});});
-	
-	
+
+
 	$('li:not(.head)').each(function(i,e) {
 		if(i % 2 == 1) {
 			$(e).addClass('even');
 		}
 	});
-	
-	
+
+
 	var timeout;
 	$('#search input').keyup(function() {
 		if(timeout) window.clearTimeout(timeout);
-		s = $(this).val();		
+		s = $(this).val();
 		timeout = window.setTimeout(function() {
 			$('#directory_list li:not(.head)').hide();
 			$('#directory_list li:not(.head)').each(function() {
@@ -265,16 +265,16 @@ $(document).ready(function() {
 				if($(this).find('.filename').text().match(reg)) {
 					$(this).show();
 				}
-			});		
-		},150);		
+			});
+		},150);
 	});
-	
-	
+
+
 	$('img[data-tooltipurl]').livequery(function() {
 		var $t = $(this);
 		var tooltipType = $t.data('tooltipurl');
 		if(tooltipType == "") return;
-		
+
 		$t.tooltip({
 			track: true,
 			delay: 500,
@@ -287,7 +287,7 @@ $(document).ready(function() {
 		});
 
 	});
-	
+
 	var openEditWindow = function (callback) {
 		if(!$('#drop').hasClass('open')) {
 			doResize();
@@ -305,20 +305,20 @@ $(document).ready(function() {
 
 		}
 	};
-	
+
 	var closeEditWindow = function (callback) {
 		if($('#drop').hasClass('open')) {
 			$('#drop').animate({'width':$(window).width()-10+'px'});
 			$('#edit').animate({'width':'0'}, function() {
 				if(callback && typeof(callback) == "function") {
 					callback();
-				}				
+				}
 			});
 			$('#drop').removeClass('open');
 		}
 
 	}
-	
+
 	var doResize = function () {
 		$('#drop, #edit').css('height', ($(window).height()-98)+'px');
 		if($('#drop').hasClass('open')) {
@@ -334,14 +334,14 @@ $(document).ready(function() {
 			$('body').removeClass('small');
 		}
 	};
-	
-	
+
+
 	var doUpload = function(files, url) {
         var http = new XMLHttpRequest();
 		var $progressBar = $('#progress');
 		var uploadTimeout = window.setTimeout(function() {
 		// Update progress bar
-		http.upload.addEventListener("progress", function (evt) {						
+		http.upload.addEventListener("progress", function (evt) {
 			if (evt.lengthComputable) {
 				$progressBar.css('width', (evt.loaded / evt.total) * 100 + "%");
 			}
@@ -370,14 +370,14 @@ $(document).ready(function() {
 
           http.open('POST', url);
           http.send(form);
-        } 
+        }
 		else {
           alert('Your browser does not support standard HTML5 Drag and Drop');
         }
 
-	}	
-	
-	
+	}
+
+
 	$('.file img, .grid .file').live("dblclick", function(e) {
 		if($(e.target).is('.editable')) return;
 		var $t = $(this).closest('li');
@@ -387,17 +387,26 @@ $(document).ready(function() {
 		);
 
 	});
-	
+
 	$('.folder img, .grid .folder').live('dblclick', function(e) {
 		if($(e.target).is('.editable')) return;
 		var $t = $(this).closest('li');
-		window.location.href = $t.data('link');
+		window.location.href = '/' + $t.data('link');
 		return false;
 	});
-	
+
+	$('.folder img, .grid .folder').live('edit', function(e) {
+		if($(e.target).is('.editable')) return;
+		var $t = $(this).closest('li');
+		$('#edit').load(
+			$('base').attr('href')+"admin/files/editfile/"+$('#drop').data('folderid')+"/"+$t.data('id'),
+			openEditWindow
+		);
+	});
+
 	$('#delete').live("click", function() {
 		if($(this).is('.disabled')) return false;
-		
+
 		var $t = $(this);
 		var files = [];
 		$('.ui-selected').each(function() {
@@ -405,43 +414,51 @@ $(document).ready(function() {
 		});
 		apprise($t.data('confirmtext'),{'confirm':true},function(r) {
 			if(r) {
-				$('#drop').load($t.attr('href'), {list : files});				
+				$('#drop').load($t.attr('href'), {list : files});
 			}
 		});
 		return false;
 	});
 
 
-	
+
 	$('#edit_button').click(function() {
 		if(!$(this).is('.disabled')) {
 			if($('#directory_list').is('.grid')) {
-				$('.ui-selected:first').dblclick();	
+				if ($('.ui-selected').hasClass('folder')) {
+					$('.ui-selected:first').trigger('edit');
+				} else {
+					$('.ui-selected:first').dblclick();
+				}
 			}
 			else {
-				$('.ui-selected:first img').dblclick();
+				if ($('.ui-selected').hasClass('folder')) {
+					$('.ui-selected:first img').trigger('edit');
+				} else {
+					$('.ui-selected:first img').dblclick();
+				}
 			}
-			
+
 		}
 		return false;
 	});
-	
-	
-	
+
+
+
 	$('#Form_FileEditForm_action_doFileCancel').live("click", function() {
 		closeEditWindow();
 		return false;
 	});
-	
+
 	$('#Form_FileEditForm').livequery(function() {
 		$(this).ajaxForm(function(response) {
 			closeEditWindow(function() {
 				refreshFiles();
 			});
 		});
-		
+
 	});
-	
+
 
 	$('.file_attach_upload').live("change", function(e) {
 		doUpload(e.target.files, $('#drop').data('uploadurl'));
@@ -452,10 +469,10 @@ $(document).ready(function() {
 	}).live("mouseleave", function() {
 		$(this).siblings('.file_upload_btn').removeClass('over');
 	});
-	
-	
-	$(window).resize(doResize);	
-	$('#drop').css('width', $(window).width()-10+'px');		
+
+
+	$(window).resize(doResize);
+	$('#drop').css('width', $(window).width()-10+'px');
 	doResize();
 	$('#footer').css('visibility','visible');
 
@@ -469,9 +486,9 @@ $(document).ready(function() {
 	if(vars["edit"]) {
 		$('li[data-id='+vars["edit"]+'] img').dblclick();
 	}
-	
+
 	var ajaxTimeout;
-	
+
 	$('body').ajaxStart(function() {
 		ajaxTimeout = window.setTimeout(function() {
 			window.parent.jQuery.fancybox.showActivity();
@@ -480,17 +497,17 @@ $(document).ready(function() {
 		window.clearTimeout(ajaxTimeout);
 		window.parent.jQuery.fancybox.hideActivity();
 	});
-	
+
 
 	// FileAttachmentField
 	function getParent() {
 		return window.parent.$parentField;
 	}
-	
+
 	if(getParent() && !getParent().is('.multi')) {
 		$('#attach').addClass('single');
 	}
-	
+
 	$('#attach').click(function() {
 		if(!$(this).is('.disabled')) {
 			var ids = [];
@@ -498,11 +515,11 @@ $(document).ready(function() {
 				ids.push($(this).data('id'));
 			});
 			$('#selected_files').append(ids.join(','));
-			window.parent.jQuery.fancybox.close();			
+			window.parent.jQuery.fancybox.close();
 		}
 	});
-	
-	
+
+
 	$('#view a').click(function() {
 		var $t = $(this);
 		$.post(
@@ -513,11 +530,11 @@ $(document).ready(function() {
 				$('#directory_list').attr('class', response);
 			}
 		);
-		return false;		
+		return false;
 	});
 
 
 
 });
-	
+
 })(jQuery);
