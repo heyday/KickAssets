@@ -18,7 +18,7 @@ $(function() {
 			'onCleanup'			: function() {
 				var ids = $('#fancybox-frame').contents().find('#selected_files').text();
 				if(!ids.length) return;
-				
+
 				var $wrap = $parentField.closest('.FileAttachmentField');
 				// make sure we don't lose any unsaved files.
 				if($wrap.is('.multi')) {
@@ -31,11 +31,11 @@ $(function() {
 					$parentField.attr('data-refreshlink'),
 					{ 'ids' : ids.split(',') }
 				);
-				$parentField = null;				
+				$parentField = null;
 			}
 		})
 	});
-	
+
 	$('.detach_btn').live("click",function() {
 		var $div = $(this).closest('.FileAttachmentField');
 		var id = $(this).attr('data-id');
@@ -47,12 +47,12 @@ $(function() {
 			$div.find('.file_drop').addClass('empty').css('background-image','none');
 			$div.find('.file_name').empty();
 			$(this).remove();
-			$div.find('input[value='+id+']').val(0);			
+			$div.find('input[value='+id+']').val(0).trigger('change');
 		}
 		showNoFile(false);
 		return false;
 	});
-	
+
 	$('.file_attach_upload').live("change", function(e) {
 		doUpload($(this), e.target.files, $(this).attr('data-uploadurl'));
         e.preventDefault();
@@ -62,30 +62,30 @@ $(function() {
 	}).live("mouseleave", function() {
 		$(this).siblings('.file_upload_btn').removeClass('over');
 	});
-	
-	
+
+
 	var showNoFile = function (cancel) {
 		$('.controls_has_file').fadeOut(function() {
 			if(cancel) {
 				$('.file_cancel_btn').show();
 			}
 			$('.controls_no_file').fadeIn();
-		})				
+		})
 	};
-	
-	
+
+
 	var showHasFile = function (cancel) {
 		$('.controls_no_file').fadeOut(function() {
 			$('.file_cancel_btn').hide();
 			$('.controls_has_file').fadeIn();
-		})		
+		})
 	}
-	
+
 	$('.replace_btn').live("click", function() {showNoFile(true)});
-	
+
 	$('.file_cancel_btn').live("click", showHasFile);
 
-	
+
 	$('.delete_btn').live("click", function() {
 		if(window.confirm($(this).attr('data-confirmtext'))) {
 			var $t = $(this);
@@ -95,19 +95,19 @@ $(function() {
 		}
 		return false;
 	});
-	
+
 
 	var doUpload = function($t, files, url) {
         var http = new XMLHttpRequest();
   		if($t.closest('.FileAttachmentField').is('.single') && files.length > 1) {
 			return false;
-		} 
+		}
 		var $progressBar = $t.closest('.FileAttachmentField').find('.progress');
 
 		var uploadTimeout = window.setTimeout(function() {
 		$progressBar.parent().css('visibility', 'visible');
 		// Update progress bar
-		http.upload.addEventListener("progress", function (evt) {						
+		http.upload.addEventListener("progress", function (evt) {
 			if (evt.lengthComputable) {
 				$progressBar.css('width', (evt.loaded / evt.total) * 100 + "%");
 			}
@@ -142,7 +142,7 @@ $(function() {
 
           http.open('POST', url);
           http.send(form);
-        } 
+        }
 		else {
           alert('Your browser does not support standard HTML5 Drag and Drop');
         }
@@ -150,7 +150,7 @@ $(function() {
 	}
 
     var dnd = {
-      ready : function() {        
+      ready : function() {
         $('.file_drop').live('dragenter', function(e) {
               e.preventDefault();
               e.stopPropagation();
@@ -168,9 +168,9 @@ $(function() {
 			        e.preventDefault();
 			        e.stopPropagation();
 					$(this).removeClass('over');
-					
+
 	              }
-			   }	
+			   }
           }).live('dragleave', function(e) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -181,7 +181,7 @@ $(function() {
 
 
 	};
-	
+
 	$('.file_drop').livequery(dnd.ready);
 
 })
