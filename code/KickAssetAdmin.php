@@ -7,28 +7,28 @@
  * @author UncleCheese <unclecheese@leftandmain.com>
  */
 class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
-	
-	
-	
+
+
+
 	/**
 	 * @var string The URL segment of the controller, preceded by "admin." Careful,
 	 *				don't change this. Right now the JS expects a value of "files"
-	 */	
+	 */
 	static $url_segment = "files";
-	
-	
-	
+
+
+
 	/**
-	 * @var string A label for the CMS menu button. 
+	 * @var string A label for the CMS menu button.
 	 * @todo This should be i18n.
-	 */	
+	 */
 	static $menu_title = "Browse files...";
 
 
 
 	/**
 	 * @var array The allowed actions on this controller
-	 */	
+	 */
 	static $allowed_actions = array (
 		'browse',
 		'select',
@@ -43,12 +43,12 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		'replace',
 		'updateview'
 	);
-	
-	
-	
+
+
+
 	/**
 	 * @var array A lookup of file extensions that define an image.
-	 */	
+	 */
 	static $image_extensions = array (
 		'jpg',
 		'png',
@@ -61,35 +61,35 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	 * @var int The size of the tool tip (width or height, which ever is greater)
 	 */
 	static $tooltip_size = 300;
-	
 
-	
+
+
 	/**
 	 * @var Folder The folder on which to start by default
-	 */		
+	 */
 	protected $currentFolder;
 
-	
-	
+
+
 	/**
 	 * @var boolean Determines if the interface will support "selection" of files, e.g.
 	 *				attaching them to pages.
-	 */	
+	 */
 	public $SelectMode = false;
-	
-	
+
+
 	/*
 	 * @var boolean Determines if we're showing an edit form on load
 	 *
 	 */
 	public $editMode = false;
-	
-	
-	
+
+
+
 	/**
 	 * Loads the requirements, checks perms, etc. If an ID is in the URL, that becomes the
 	 * current folder.
-	 */	
+	 */
 	public function init() {
 		parent::init();
 		if(!Permission::check("ADMIN") && !Permission::check("CMS_ACCESS_BrowseFiles")) {
@@ -119,13 +119,13 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 			$this->currentFolder = singleton('Folder');
 			$this->currentPath = false;
 		}
-		
+
 	}
-	
+
 
 
 	/**
-	 * 
+	 *
 	 * The browse action is "select" if we're in select mode.
 	 * @return
 	 */
@@ -133,8 +133,8 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		return $this->SelectMode ? "select" : "browse";
 	}
 
-	
-	
+
+
 	/**
 	 * Template accessor for the current folder
 	 *
@@ -143,9 +143,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function getCurrentFolder() {
 		return $this->currentFolder;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Template accessor for the current folder name
 	 *
@@ -157,9 +157,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		}
 		return ASSETS_DIR;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Template accessor for the current folder ID
 	 *
@@ -168,21 +168,21 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function getCurrentFolderID() {
 		return $this->currentFolder ? $this->currentFolder->ID : 0;
 	}
-	
 
-	
+
+
 	/**
-	 * By default, the controller forwards to the "browse" action 
+	 * By default, the controller forwards to the "browse" action
 	 *
 	 * @param SS_HTTPRequest
 	 * @return SS_HTTPResponse
-	 */	
+	 */
 	public function index(SS_HTTPRequest $r) {
 		return Director::redirect($this->Link('browse'));
 	}
-	
-	
-	
+
+
+
 	/**
 	 * The select action just tells the controller that {@link KickAssetAdmin::$SelectMode} is on
 	 * and proceeds to the browsing.
@@ -194,9 +194,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		$this->SelectMode = true;
 		return $this->browse($r);
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Not much happens here -- mostly a placeholder method. If the request comes in as ajax
 	 * we only need to render the file list.
@@ -210,9 +210,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		}
 		return array();
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Replaces a file with another while keeping a persistent ID.
 	 *
@@ -254,9 +254,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		}
 		return $response;
 	}
-	
 
-	
+
+
 	/**
 	 * Creates a new folder at the level of {@link KickAssetAdmin::$currentFolder}
 	 *
@@ -274,9 +274,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		}
 		return $this->browse($r);
 	}
-	
-		
-	
+
+
+
 	/**
 	 * Changes the name of a file
 	 *
@@ -286,15 +286,16 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function updatefilename(SS_HTTPRequest $r) {
 		if($file = DataObject::get_by_id("File", (int) $r->requestVar('fileid'))) {
 			$file->setName($r->requestVar('new'));
+			$file->Title = $file->Name;
 			$file->write();
 			$template = $file instanceof Folder ? "Folder" : "File";
 			return $this->customise($this->getFields($file))->renderWith($template);
 		}
 
 	}
-	
 
-	
+
+
 	/**
 	 * Moves a file from one folder to another.
 	 *
@@ -302,10 +303,10 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	 * @return SS_HTTPResponse
 	 */
 	public function move(SS_HTTPRequest $r) {
-		if($r->requestVar('source') && is_array($r->requestVar('source')) && $r->requestVar('dest')) {    
+		if($r->requestVar('source') && is_array($r->requestVar('source')) && $r->requestVar('dest')) {
 			foreach($r->requestVar('source') as $id) {
 				if($id == $r->requestVar('dest')) continue;
-				
+
 				if($file = DataObject::get_by_id("File", (int) $id)) {
 					$file->ParentID = $r->requestVar('dest');
 					$file->write();
@@ -314,7 +315,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 			return $this->browse($r);
 		}
 	}
-	
+
 
 
 	/**
@@ -352,9 +353,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 			))->renderWith('EditFields');
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Changes the layout of the files. Store in session so it persists throughout
 	 * other implementations of this window, e.g. {@link FileAttachmentField}
@@ -369,16 +370,16 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		elseif($r->requestVar('view') == "gallery") {
 			Session::set("KickAssetAdmin.VIEW","gallery");
 		}
-		return new SS_HTTPResponse(Session::get("KickAssetAdmin.VIEW"),200);		
+		return new SS_HTTPResponse(Session::get("KickAssetAdmin.VIEW"),200);
 	}
 
-	
+
 
 	/**
 	 * Creates the edit form for a file given a File object.
-	 * 
+	 *
 	 * @todo This is a bit ugly -- the first parameter is a SS_HTTPRequest on POST, but
-	 *		 otherwise a File. 
+	 *		 otherwise a File.
 	 * @param SS_HTTPRequest|File Ambiguous first paramteter!
 	 * @return Form
 	 */
@@ -407,32 +408,32 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		$cancel->addExtraClass("btn");
 		return $f;
 	}
-	
-	
-	
+
+
+
 	/**
-	 * Generate a link to delete a file. The File ID comes off the element's metadata. 
+	 * Generate a link to delete a file. The File ID comes off the element's metadata.
 	 *
 	 * @return string
-	 */	
+	 */
 	public function DeleteLink() {
 		return $this->Link('delete/'.$this->getCurrentFolderID());
 	}
-	
-	
-	
+
+
+
 	/**
-	 * Generate a link to create a new folder 
+	 * Generate a link to create a new folder
 	 *
 	 * @return string
 	 */
 	public function NewFolderLink() {
 		return $this->Link('newfolder/'.$this->getCurrentFolderID());
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * A template accessor for the tooltip size.
 	 *
@@ -441,9 +442,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function TooltipSize() {
 		return self::$tooltip_size;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Get the list of Folder objects under the current folder
 	 *
@@ -452,7 +453,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function Folders() {
 		$set = DataObject::get("Folder","ParentID = {$this->getCurrentFolderID()}");
 		if(!$set) return false;
-		
+
 		$ret = new DataObjectSet();
 		foreach($set as $folder) {
 			$ret->push(new ArrayData($this->getFields($folder)));
@@ -467,7 +468,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	 *
 	 * @return DataObjectSet
 	 */
-	public function Files() {		
+	public function Files() {
 		$set = DataObject::get("File","ClassName != 'Folder' AND ParentID = {$this->getCurrentFolderID()}");
 		if(!$set) return false;
 		$ret = new DataObjectSet();
@@ -477,7 +478,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		return $ret;
 
 	}
-	
+
 
 
 	/**
@@ -488,9 +489,9 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function TopLevel() {
 		return $this->getCurrentFolderID() == 0;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Generate a link to the parent folder
 	 *
@@ -500,8 +501,8 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function ParentLink() {
 		return $this->Link($this->getBrowseAction().'/'.$this->currentFolder->ParentID);
 	}
-	
-	
+
+
 	/**
 	 * Generate linked breadcrumbs for the folder hierarchy
 	 *
@@ -521,11 +522,11 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 			$ret .= " / <a href='$link'>$name</a>";
 		}
 		return substr_replace($ret, "",0,3);
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Generate a link to upload to this controller
 	 *
@@ -534,8 +535,8 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function UploadLink() {
 		return Director::absoluteBaseURL().$this->Link('upload/'.$this->getCurrentFolderID());
 	}
-	
-	
+
+
 	public function GalleryLink() {
 		return Controller::join_links($this->Link(),'updateview', '?view=gallery');
 	}
@@ -544,14 +545,14 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	public function GridLink() {
 		return Controller::join_links($this->Link(),'updateview', '?view=grid');
 	}
-	
-	
-	
+
+
+
 	public function CurrentView($view) {
 		return $view == $this->View();
 	}
-	
-	
+
+
 	public function View() {
 		if($view = Session::get("KickAssetAdmin.VIEW")) {
 			return $view;
@@ -559,12 +560,12 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		return "gallery";
 	}
 
-	
+
 	/**
-	 * Creates the permissions for using this interface {@see PermissionProvider} 
+	 * Creates the permissions for using this interface {@see PermissionProvider}
 	 *
 	 * @return array
-	 */	
+	 */
 	public function providePermissions() {
 		return array (
 			'CMS_ACCESS_BrowseFiles' => 'Browse and upload files'
@@ -572,7 +573,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	}
 
 
-	
+
 	/**
 	 * Adds some metadata to a {@link File} object that is used by the view. This function
 	 * allows us to avoid having to use a decorator on the {@link File} class.
@@ -584,7 +585,7 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		if($f instanceof Folder) {
 			return array (
 				'Link' => $this->Link($this->getBrowseAction().'/'.$f->ID),
-				'Item' => $f				
+				'Item' => $f
 			);
 		}
 		$image = ($f instanceof Image);
@@ -596,22 +597,22 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 				}
 				else {
 						$tooltipurl = $f->getHeight() > self::$tooltip_size ? $f->setHeight(self::$tooltip_size)->getURL() : $f->getURL();
-				}	
+				}
 			}
 		}
 		return array(
-			'Link' => '',	
+			'Link' => '',
 			'Item' => $f,
 			'IconURL' => $image ? (($i = $f->SetHeight(64)) ? $i->getURL() : KickAssetUtil::get_icon($f)) : KickAssetUtil::get_icon($f),
 			'Image' => $image,
 			'TooltipURL' => $tooltipurl
 		);
 
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * For the edit form, we don't want the default scaffolding because it adds a lot of
 	 * noise. Allow for the decorator pattern by providing and extend() to updateCMSFields.
@@ -640,12 +641,12 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 		$folders->setEmptyString('(root)');
 		if($file->hasMethod('updateCMSFields')) {
 			if(version_compare(PHP_VERSION, '5.3') >= 0) {
-				$file->updateCMSFields(&$fields);	
+				$file->updateCMSFields(&$fields);
 			}
 			else {
-				$file->updateCMSFields($fields);	
+				$file->updateCMSFields($fields);
 			}
-			
+
 		}
 		return $fields;
 	}
@@ -664,11 +665,11 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 			$form->saveInto($file);
 			$file->write();
 			return new SS_HTTPResponse("OK", 200);
-		}		
+		}
 	}
-	
-	
-	
+
+
+
 }
 
 
@@ -681,13 +682,13 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
  * @author UncleCheese <unclecheese@leftandmain.com>
  */
 class KickAssetAdmin_FolderDropdownField extends DropdownField {
-	
-	
-	
+
+
+
 	protected $parentID, $filter;
 
-	
-	
+
+
 	/**
 	 * Assigns the parent ID to the form field. The parent ID is the level of hierarchy where
 	 * the tree will start.
@@ -698,8 +699,8 @@ class KickAssetAdmin_FolderDropdownField extends DropdownField {
 		parent::__construct($name, $title, null, $value, $form, $emptyString);
 	}
 
-	
-	
+
+
 	/**
 	 * Sets a filter clause for the tree.
 	 *
@@ -724,7 +725,7 @@ class KickAssetAdmin_FolderDropdownField extends DropdownField {
 	}
 
 
-	
+
 	/**
 	 * A recursive function that generates the hierarchy of folders.
 	 *
@@ -740,11 +741,11 @@ class KickAssetAdmin_FolderDropdownField extends DropdownField {
 				$indent="";
 				for($i=0;$i<$level;$i++) $indent .= "__";
 				$text = $child->Name;
-				$options[$child->ID] = $indent.$text;		
+				$options[$child->ID] = $indent.$text;
 				$options += $this->getHierarchy($child->ID, $level+1);
 			}
 		}
 		return $options;
 	}
-		
+
 }
