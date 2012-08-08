@@ -681,10 +681,14 @@ class KickAssetAdmin extends LeftAndMain implements PermissionProvider {
 	protected function updateExtensionCMSFields($ext, $fields) {
 
 		if(version_compare(PHP_VERSION, '5.3') >= 0) {
-			$ext->updateCMSFields(&$fields);
+            if(method_exists($ext, 'updateCMSFields')){
+                $ext->updateCMSFields(&$fields);
+            }
 		}
 		else {
-			$ext->updateCMSFields($fields);
+            if(method_exists($ext, 'updateCMSFields')){
+                $ext->updateCMSFields($fields);
+            }
 		}
 
 	}
