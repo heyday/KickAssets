@@ -71,7 +71,7 @@
 
 		http.addEventListener("load", function () {
 			if(http.responseText != "OK") {
-				apprise(http.responseText);
+				apprise(http.responseText, {appendTo:'#drop'});
 			}
 			refreshFiles();
 			if($('#drop').is('.open')) {
@@ -120,7 +120,14 @@ $(document).ready(function() {
 //	$('#drop, #replace-file').livequery(dnd.ready);
 //	$('#drop').css('height',$('body').height()-20+'px');
 	var toRename;
-
+	
+	$('#filesystemsync').click(function() {
+		$.get($(this).attr('href'), function(data) {
+			apprise(data, {appendTo:'#drop'});
+		});
+		return false;
+	});
+	
 	$('#newfolder').click(function() {
 		var $t = $(this);
 		$('#drop').load($t.attr('href'));
@@ -353,7 +360,7 @@ $(document).ready(function() {
 		http.addEventListener("load", function () {
 			window.clearTimeout(uploadTimeout);
 			if(http.status != "200") {
-				apprise(http.responseText);
+				apprise(http.responseText, {appendTo:'#drop'});
 			}
 			else {
 				refreshFiles();
@@ -409,10 +416,10 @@ $(document).ready(function() {
 
 		var $t = $(this);
 		var files = [];
-		$('.ui-selected').each(function() {
+		$('.ui-selected:visible').each(function() {
 			files.push($(this).data('id'));
 		});
-		apprise($t.data('confirmtext'),{'confirm':true},function(r) {
+		apprise($t.data('confirmtext'),{'confirm':true,appendTo:'#drop'},function(r) {
 			if(r) {
 				$('#drop').load($t.attr('href'), {list : files});
 			}
@@ -511,7 +518,7 @@ $(document).ready(function() {
 	$('#attach').click(function() {
 		if(!$(this).is('.disabled')) {
 			var ids = [];
-			$('.ui-selected').each(function() {
+			$('.ui-selected:visible').each(function() {
 				ids.push($(this).data('id'));
 			});
 			$('#selected_files').append(ids.join(','));
